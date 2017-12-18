@@ -90,6 +90,12 @@ class ImportAction < ActiveRecord::Base
     v, value = row[:value], row[:value]
     format = row[:format]
     case field
+    when "priority_id"
+      if format == :string
+        v = IssuePriority.find_by_name(value).id rescue -1
+      else
+        v = IssuePriority.find_by_id(value).id rescue -1
+      end
     when "status_id"
       if format == :string
         v = IssueStatus.find_by_name(value).id rescue -1
@@ -103,13 +109,13 @@ class ImportAction < ActiveRecord::Base
       v = value.to_i == 0 ? false : true
     when "category_id"
       if format == :string
-        v = Category.find_by_name(value).id rescue -1
+        v = IssueCategory.where(:name => value, :project_id => project).first.id rescue -1
       else
-        v = Category.find_by_id(value).id rescue -1
+        v = IssueCategory.find_by_id(value).id rescue -1
       end
     when "fixed_version_id"
       if format == :string
-        v = Version.find_by_name(value).id rescue -1
+       v = Version.where(:name => value, :project_id => project).first.id rescue -1
       else
         v = Version.find_by_id(value).id rescue -1
       end                  
